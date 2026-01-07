@@ -66,7 +66,7 @@ const OutlierBadge = ({ reason }) => (
 );
 
 // Filter Drawer Component
-const FilterDrawer = ({ isOpen, onClose }) => {
+const FilterDrawer = ({ isOpen, onClose, isRSEnabled }) => {
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-50 flex">
@@ -248,7 +248,7 @@ export default function App() {
         </div>
       </div>
 
-      <FilterDrawer isOpen={isFiltersOpen} onClose={() => setIsFiltersOpen(false)} />
+      <FilterDrawer isOpen={isFiltersOpen} onClose={() => setIsFiltersOpen(false)} isRSEnabled={isRSEnabled} />
 
       <main className="flex-1 p-8 overflow-y-auto bg-slate-50/50">
         <div className="max-w-7xl mx-auto">
