@@ -88,24 +88,50 @@ const generateRooms = () => {
 
             // Metrics
             const daysInPeriod = 30;
-            const occupancyRate = 0.65 + Math.random() * 0.25;
-            const occupiedNights = Math.floor(daysInPeriod * occupancyRate);
+
+            // Past Period Occupancy Breakdown
+            // Owner nights (crown owners only)
+            const ownerNights = owner.isCrown ? Math.floor(Math.random() * 6) : 0; // 0-5 nights for crown owners
+            // Blocked nights (maintenance, repairs, etc.)
+            const blockedNights = Math.random() < 0.25 ? Math.floor(Math.random() * 4) + 1 : 0; // 1-4 nights, 25% chance
+            // Guest nights (remaining occupancy after owner and blocked)
+            const remainingForGuests = daysInPeriod - ownerNights - blockedNights;
+            const guestOccupancyRate = 0.55 + Math.random() * 0.35; // 55-90% of remaining days
+            const guestNights = Math.floor(remainingForGuests * guestOccupancyRate);
+
+            // Total occupied nights and occupancy rate
+            const occupiedNights = guestNights + ownerNights + blockedNights;
+            const occupancyRate = occupiedNights / daysInPeriod;
+
+            // Calculate individual percentages
+            const guestOccupancyPct = Math.round((guestNights / daysInPeriod) * 100);
+            const ownerOccupancyPct = Math.round((ownerNights / daysInPeriod) * 100);
+            const blockedOccupancyPct = Math.round((blockedNights / daysInPeriod) * 100);
+
             const adr = roomType.baseADR * (0.9 + Math.random() * 0.2);
-            const actualRevenue = Math.floor(occupiedNights * adr);
+            const actualRevenue = Math.floor(guestNights * adr); // Only guest nights generate actual revenue
+            const imputedRevenue = Math.round(ownerNights * adr);
 
-            // Owner nights and imputed revenue
-            const ownerNights = owner.isCrown ? Math.floor(Math.random() * 4) : 0; // 0-3 nights
-            const imputedRevenue = ownerNights * adr;
+            // Future Period (Next 30 Days) Breakdown
+            // Future owner bookings
+            const futureOwnerNights = owner.isCrown ? Math.floor(Math.random() * 5) : 0; // 0-4 nights planned
+            // Future blocked nights (scheduled maintenance, etc.)
+            const futureBlockedNights = Math.random() < 0.15 ? Math.floor(Math.random() * 3) + 1 : 0; // 1-3 nights, 15% chance
+            // Future guest bookings
+            const futureRemainingForGuests = daysInPeriod - futureOwnerNights - futureBlockedNights;
+            const futureGuestBookingRate = 0.3 + Math.random() * 0.4; // 30-70% of remaining days booked
+            const futureGuestNights = Math.floor(futureRemainingForGuests * futureGuestBookingRate);
 
-            // Future Availability (Next Period)
-            // Different from Future Nights (which is unweighted RS component). Let's treat them as similar for demo but distinct.
-            // Future availability: "14/30" (nights available / total nights)
-            const futureAvailableNights = Math.floor(daysInPeriod * (0.4 + Math.random() * 0.4)); // 40-80% available
+            // Future availability is the unbooked portion
+            const futureBookedNights = futureGuestNights + futureOwnerNights + futureBlockedNights;
+            const futureAvailableNights = daysInPeriod - futureBookedNights;
+
+            // Calculate future percentages
+            const futureGuestPct = Math.round((futureGuestNights / daysInPeriod) * 100);
+            const futureOwnerPct = Math.round((futureOwnerNights / daysInPeriod) * 100);
+            const futureBlockedPct = Math.round((futureBlockedNights / daysInPeriod) * 100);
 
             const futureNightsWeighted = Math.floor(futureAvailableNights * (0.8 + Math.random() * 0.4));
-
-            // Blocked nights
-            const blockedNights = Math.random() < 0.2 ? Math.floor(Math.random() * 5) : 0;
 
             const bookings = Math.floor(3 + Math.random() * 8);
             const rsChange = (Math.random() - 0.5) * 6;
@@ -123,11 +149,21 @@ const generateRooms = () => {
                 actualRevenue,
                 imputedRevenue,
                 ownerNights,
-                futureAvailableNights, // for next 30 days
+                guestNights,
+                blockedNights,
+                guestOccupancyPct,
+                ownerOccupancyPct,
+                blockedOccupancyPct,
+                futureAvailableNights,
+                futureGuestNights,
+                futureOwnerNights,
+                futureBlockedNights,
+                futureGuestPct,
+                futureOwnerPct,
+                futureBlockedPct,
                 futureNightsWeighted,
                 occupancy: Math.round(occupancyRate * 100),
                 occupiedNights,
-                blockedNights, // for comparison tab
                 adr: Math.round(adr),
                 checkoutTime: cirs === 'Occupied' && Math.random() > 0.5 ? '11:00 AM' : null,
                 nextCheckinTime: Math.random() > 0.7 ? '3:00 PM' : null

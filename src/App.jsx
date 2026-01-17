@@ -13,16 +13,22 @@ import {
 import './App.css';
 
 // Simple Tooltip Component
-const Tooltip = ({ text, children, position = 'top' }) => (
+const Tooltip = ({ text, children, position = 'top', align = 'center' }) => (
   <div className="group relative border-b border-dotted border-slate-300 inline-block cursor-help">
     {children}
     <div className={clsx(
-      "absolute left-1/2 -translate-x-1/2 hidden group-hover:block w-56 p-2 bg-slate-900 text-white text-[10px] rounded-lg shadow-2xl z-[100] text-center font-normal leading-tight ring-1 ring-white/10",
-      position === 'top' ? "bottom-full mb-2" : "top-full mt-2"
+      "absolute hidden group-hover:block w-56 p-2 bg-slate-900 text-white text-[10px] rounded-lg shadow-2xl z-[100] text-center font-normal leading-tight ring-1 ring-white/10",
+      position === 'top' ? "bottom-full mb-2" : "top-full mt-2",
+      align === 'center' && "left-1/2 -translate-x-1/2",
+      align === 'left' && "left-0",
+      align === 'right' && "right-0"
     )}>
       {text}
       <div className={clsx(
-        "absolute left-1/2 -translate-x-1/2 border-4 border-transparent",
+        "absolute border-4 border-transparent",
+        align === 'center' && "left-1/2 -translate-x-1/2",
+        align === 'left' && "left-4",
+        align === 'right' && "right-4",
         position === 'top' ? "top-full border-t-slate-900" : "bottom-full border-b-slate-900"
       )} />
     </div>
@@ -364,87 +370,147 @@ function PerformanceTab({ onRoomClick, isRSEnabled }) {
                     <table className="w-full text-sm min-w-[1000px]">
                       <thead className="bg-slate-50 text-slate-500 font-bold uppercase tracking-widest text-[10px] border-b border-slate-200 sticky top-0 z-20">
                         <tr>
-                          <th className="px-4 py-4 text-left">{isRSEnabled ? 'Unit Rank' : 'Group Rank'}</th>
-                          <th className="px-4 py-4 text-left">Internal ID</th>
-                          {isRSEnabled && <th className="px-4 py-4 text-left">Owner</th>}
-                          <th className="px-4 py-4 text-left">
-                            <Tooltip text="Check-In Readiness Status: Real-time operational state.">
-                              <span className="flex items-center gap-1 underline decoration-dotted decoration-slate-300">CIRS <Info className="w-3 h-3 text-slate-300" /></span>
+                          <th className="px-4 py-4 text-left w-20">
+                            <Tooltip text={isRSEnabled ? "Priority within this Room Type." : "Relative rank within group."} position="bottom" align="left">
+                              <span className="underline decoration-dotted decoration-slate-300">{isRSEnabled ? 'Priority' : 'Rank'}</span>
                             </Tooltip>
                           </th>
-                          <th className="px-4 py-4 text-right">
-                            <Tooltip text="Booked nights / Available nights.">
-                              <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300">Occupancy <Info className="w-3 h-3 text-slate-300" /></span>
+                          <th className="px-4 py-4 text-left w-16">Unit</th>
+                          <th className="px-4 py-4 text-right w-24 border-l border-slate-200">
+                            <Tooltip text="Total occupancy % (Guest + Owner + Blocked)." position="bottom">
+                              <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300 font-bold text-slate-700">Total Occ <Info className="w-3 h-3 text-slate-400" /></span>
                             </Tooltip>
                           </th>
-                          <th className="px-4 py-4 text-right">
-                            <Tooltip text="Average Daily Rate.">
-                              <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300">ADR <Info className="w-3 h-3 text-slate-300" /></span>
+                          <th className="px-4 py-4 text-right w-24">
+                            <Tooltip text="Percentage of guest stays (paid bookings)." position="bottom">
+                              <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300">Guest Occ <Info className="w-3 h-3 text-slate-300" /></span>
                             </Tooltip>
                           </th>
-                          <th className="px-4 py-4 text-right">
-                            <Tooltip text="Revenue Per Available Room.">
-                              <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300">RevPAR <Info className="w-3 h-3 text-slate-300" /></span>
+                          <th className="px-4 py-4 text-right w-24">
+                            <Tooltip text="Percentage of owner personal stay nights." position="bottom">
+                              <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300">Owner Occ <Info className="w-3 h-3 text-slate-300" /></span>
                             </Tooltip>
                           </th>
-                          <th className="px-4 py-4 text-right">Actual Rev</th>
+                          <th className="px-4 py-4 text-right w-24">
+                            <Tooltip text="Percentage of nights blocked for maintenance or other reasons." position="bottom">
+                              <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300">Blocked <Info className="w-3 h-3 text-slate-300" /></span>
+                            </Tooltip>
+                          </th>
+                          <th className="px-4 py-4 text-right w-28 border-l border-slate-200">Actual Rev</th>
                           {isRSEnabled && (
-                            <th className="px-4 py-4 text-right">
-                              <Tooltip text="Estimated revenue value of owner stay nights.">
+                            <th className="px-4 py-4 text-right w-28">
+                              <Tooltip text="Estimated revenue value of owner stay nights." position="bottom">
                                 <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300 whitespace-nowrap">Imputed Rev <Info className="w-3 h-3 text-slate-300" /></span>
                               </Tooltip>
                             </th>
                           )}
+                          <th className="px-4 py-4 text-right w-24 border-l border-slate-200">
+                            <Tooltip text="Total future booked nights % (Guest + Owner + Blocked)." position="bottom">
+                              <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300 leading-[1.1] font-bold text-slate-700">Total Future <br /> Occ <Info className="w-3 h-3 text-slate-400" /></span>
+                            </Tooltip>
+                          </th>
+                          <th className="px-4 py-4 text-right w-24">
+                            <Tooltip text="Future guest bookings." position="bottom">
+                              <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300 leading-[1.1]">Future <br /> Guest <Info className="w-3 h-3 text-slate-300" /></span>
+                            </Tooltip>
+                          </th>
+                          <th className="px-4 py-4 text-right w-24">
+                            <Tooltip text="Future owner bookings." position="bottom">
+                              <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300 leading-[1.1]">Future <br /> Owner <Info className="w-3 h-3 text-slate-300" /></span>
+                            </Tooltip>
+                          </th>
+                          <th className="px-4 py-4 text-right w-24">
+                            <Tooltip text="Future blocked nights." position="bottom">
+                              <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300 leading-[1.1]">Future <br /> Blocked <Info className="w-3 h-3 text-slate-300" /></span>
+                            </Tooltip>
+                          </th>
+                          <th className="px-4 py-4 text-right w-24">
+                            <Tooltip text="Percentage of nights available in the next 30 days." position="bottom">
+                              <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300 leading-[1.1]">Future <br /> Available <Info className="w-3 h-3 text-slate-300" /></span>
+                            </Tooltip>
+                          </th>
                           {isRSEnabled && (
-                            <th className="px-4 py-4 text-right">
-                              <Tooltip text="Relative performance score (0-100) within room type cohort.">
+                            <th className="px-4 py-4 text-right w-24 border-l border-slate-200">
+                              <Tooltip text="Relative performance score (0-100) within room type cohort." position="bottom">
                                 <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300 whitespace-nowrap">Revenue Score <Info className="w-3 h-3 text-slate-300" /></span>
                               </Tooltip>
                             </th>
                           )}
-                          {isRSEnabled && <th className="px-4 py-4 text-right text-slate-400">Trend</th>}
-                          <th className="px-4 py-4 text-right">
-                            <Tooltip text="Percentage of nights available in the next 30 days.">
-                              <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300 whitespace-nowrap">Availability <Info className="w-3 h-3 text-slate-300" /></span>
+                          {isRSEnabled && <th className="px-4 py-4 text-right text-slate-400 w-16">Trend</th>}
+                          <th className={clsx("px-4 py-4 text-right w-20", !isRSEnabled && "border-l border-slate-200")}>
+                            <Tooltip text="Average Daily Rate." position="bottom">
+                              <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300">ADR <Info className="w-3 h-3 text-slate-300" /></span>
                             </Tooltip>
                           </th>
-                          <th className="px-4 py-4"></th>
+                          <th className="px-4 py-4 text-right w-20">
+                            <Tooltip text="Revenue Per Available Room." position="bottom">
+                              <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300">RevPAR <Info className="w-3 h-3 text-slate-300" /></span>
+                            </Tooltip>
+                          </th>
+                          {isRSEnabled && <th className="px-4 py-4 text-left w-32 border-l border-slate-200">Owner</th>}
+                          <th className="px-4 py-4 text-left w-24">
+                            <Tooltip text="Check-In Readiness Status: Real-time operational state." position="bottom" align="right">
+                              <span className="flex items-center gap-1 underline decoration-dotted decoration-slate-300">CIRS <Info className="w-3 h-3 text-slate-300" /></span>
+                            </Tooltip>
+                          </th>
+                          <th className="px-4 py-4 w-10"></th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100">
                         {rooms.filter(r => r.roomTypeId === rt.id).map(room => (
                           <tr key={room.id} onClick={() => onRoomClick(room)} className="hover:bg-slate-50 cursor-pointer transition-colors group">
-                            <td className="px-4 py-4 font-bold text-slate-400 text-xs">#{room.rank}</td>
-                            <td className="px-4 py-4 font-bold text-slate-900 text-xs">{room.number}</td>
+                            <td className="px-4 py-4 font-bold text-slate-400 text-xs w-24">#{room.rank}</td>
+                            <td className="px-4 py-4 font-bold text-slate-900 text-xs w-16">{room.number}</td>
+                            <td className="px-4 py-4 text-right font-bold text-slate-900 text-xs w-24 border-l border-slate-200 bg-slate-50/50">{room.occupancy}%</td>
+                            <td className="px-4 py-4 text-right font-bold text-slate-700 text-xs w-24">
+                              {room.guestOccupancyPct}% <span className="text-[10px] text-slate-400 font-normal">({room.guestNights})</span>
+                            </td>
+                            <td className="px-4 py-4 text-right font-bold text-slate-700 text-xs w-24">
+                              {room.ownerOccupancyPct}% <span className="text-[10px] text-slate-400 font-normal">({room.ownerNights})</span>
+                            </td>
+                            <td className="px-4 py-4 text-right font-bold text-slate-700 text-xs w-24">
+                              {room.blockedOccupancyPct}% <span className="text-[10px] text-slate-400 font-normal">({room.blockedNights})</span>
+                            </td>
+                            <td className="px-4 py-4 text-right w-28 border-l border-slate-200">
+                              <span className="font-bold text-blue-600 text-xs">{formatCurrency(room.actualRevenue)}</span>
+                            </td>
                             {isRSEnabled && (
-                              <td className="px-4 py-4">
+                              <td className="px-4 py-4 text-right whitespace-nowrap w-28">
+                                <span className="font-bold text-slate-600 text-xs">{formatCurrency(room.imputedRevenue)}</span>
+                                <span className="text-[9px] font-bold text-slate-400 ml-0.5">({room.ownerNights})</span>
+                              </td>
+                            )}
+                            <td className="px-4 py-4 text-right font-bold text-slate-900 text-[10px] whitespace-nowrap w-24 border-l border-slate-200 bg-slate-50/50">
+                              {Math.round((30 - room.futureAvailableNights) / 30 * 100)}% <span className="text-[9px] text-slate-400 font-normal">({30 - room.futureAvailableNights})</span>
+                            </td>
+                            <td className="px-4 py-4 text-right font-bold text-slate-700 text-[10px] whitespace-nowrap w-24">
+                              {room.futureGuestPct}% <span className="text-[9px] text-slate-400 font-normal">({room.futureGuestNights})</span>
+                            </td>
+                            <td className="px-4 py-4 text-right font-bold text-slate-700 text-[10px] whitespace-nowrap w-24">
+                              {room.futureOwnerPct}% <span className="text-[9px] text-slate-400 font-normal">({room.futureOwnerNights})</span>
+                            </td>
+                            <td className="px-4 py-4 text-right font-bold text-slate-700 text-[10px] whitespace-nowrap w-24">
+                              {room.futureBlockedPct}% <span className="text-[9px] text-slate-400 font-normal">({room.futureBlockedNights})</span>
+                            </td>
+                            <td className="px-4 py-4 text-right font-bold text-slate-700 text-[10px] whitespace-nowrap w-24">{room.futureAvailableNights} / 30</td>
+                            {isRSEnabled && <td className="px-4 py-4 text-right font-black text-slate-900 text-xs w-24 border-l border-slate-200">{formatRS(room.rs)}</td>}
+                            {isRSEnabled && (
+                              <td className={clsx('px-4 py-4 text-right font-bold text-[10px] w-16', room.rsChange >= 0 ? 'text-emerald-600' : 'text-red-500')}>
+                                {room.rsChange >= 0 ? '+' : ''}{room.rsChange}
+                              </td>
+                            )}
+                            <td className={clsx("px-4 py-4 text-right font-bold text-slate-600 text-[10px] w-20", !isRSEnabled && "border-l border-slate-200")}>{formatCurrency(room.adr)}</td>
+                            <td className="px-4 py-4 text-right font-bold text-slate-600 text-[10px] w-20">{formatCurrency(Math.round(room.adr * room.occupancy / 100))}</td>
+                            {isRSEnabled && (
+                              <td className="px-4 py-4 w-32 border-l border-slate-200">
                                 <div className="flex items-center gap-1.5 overflow-hidden">
                                   {room.owner.isCrown && <Crown className="w-3 h-3 text-amber-500 fill-amber-100 shrink-0" />}
                                   <span className="font-bold text-slate-700 text-[10px] truncate max-w-[70px]">{room.owner.name}</span>
                                 </div>
                               </td>
                             )}
-                            <td className="px-4 py-4"><CIRSBadge status={room.cirs} /></td>
-                            <td className="px-4 py-4 text-right font-bold text-slate-700 text-xs">{room.occupancy}%</td>
-                            <td className="px-4 py-4 text-right font-bold text-slate-600 text-[10px]">{formatCurrency(room.adr)}</td>
-                            <td className="px-4 py-4 text-right font-bold text-slate-600 text-[10px]">{formatCurrency(Math.round(room.adr * room.occupancy / 100))}</td>
-                            <td className="px-4 py-4 text-right">
-                              <span className="font-bold text-blue-600 text-xs">{formatCurrency(room.actualRevenue)}</span>
-                            </td>
-                            {isRSEnabled && (
-                              <td className="px-4 py-4 text-right whitespace-nowrap">
-                                <span className="font-bold text-slate-600 text-xs">{formatCurrency(room.imputedRevenue)}</span>
-                                <span className="text-[9px] font-bold text-slate-400 ml-0.5">({room.ownerNights})</span>
-                              </td>
-                            )}
-                            {isRSEnabled && <td className="px-4 py-4 text-right font-black text-slate-900 text-xs">{formatRS(room.rs)}</td>}
-                            {isRSEnabled && (
-                              <td className={clsx('px-4 py-4 text-right font-bold text-[10px]', room.rsChange >= 0 ? 'text-emerald-600' : 'text-red-500')}>
-                                {room.rsChange >= 0 ? '+' : ''}{room.rsChange}
-                              </td>
-                            )}
-                            <td className="px-4 py-4 text-right font-bold text-emerald-600 text-[10px] whitespace-nowrap">{room.futureAvailableNights} / 30</td>
-                            <td className="px-4 py-4 text-right">
+                            <td className="px-4 py-4 w-24"><CIRSBadge status={room.cirs} /></td>
+                            <td className="px-4 py-4 text-right w-10">
                               <div className="flex items-center justify-end gap-1">
                                 {room.isOutlier && isRSEnabled && <OutlierBadge reason={room.outlierReason} />}
                                 <div className="opacity-0 group-hover:opacity-100 transition-opacity">
@@ -469,7 +535,7 @@ function PerformanceTab({ onRoomClick, isRSEnabled }) {
           <div className="space-y-4">
             <p className="text-sm font-bold text-slate-500 uppercase tracking-widest pl-2">Portfolio Management View</p>
             {ownerRollup.slice(0, 15).map(owner => (
-              <div key={owner.id} className="bg-white rounded-xl border border-slate-200 overflow-x-auto shadow-sm transition-all hover:shadow-md">
+              <div key={owner.id} className="bg-white rounded-xl border border-slate-200 shadow-sm transition-all hover:shadow-md relative hover:z-30">
                 <button
                   onClick={() => setExpanded(e => ({ ...e, [owner.id]: !e[owner.id] }))}
                   className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors"
@@ -513,7 +579,7 @@ function PerformanceTab({ onRoomClick, isRSEnabled }) {
                     <div className="group cursor-help">
                       <Tooltip text="Available capacity for bookings over the next 30 days.">
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5 whitespace-nowrap">Future Availability</p>
-                        <p className="text-sm font-bold text-emerald-600 group-hover:text-emerald-700 transition-colors">{owner.futureAvailabilityPct}% {isRSEnabled && <span className="text-[10px] font-bold text-slate-400">({owner.totalOwnerNights})</span>}</p>
+                        <p className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors">{owner.futureAvailabilityPct}% {isRSEnabled && <span className="text-[10px] font-bold text-slate-400">({owner.totalOwnerNights})</span>}</p>
                       </Tooltip>
                     </div>
                     {isRSEnabled && (
@@ -531,31 +597,118 @@ function PerformanceTab({ onRoomClick, isRSEnabled }) {
                     <table className="w-full text-sm min-w-[1000px]">
                       <thead className="bg-slate-100/50 text-slate-500 font-bold uppercase tracking-widest text-[10px] border-b border-slate-100 sticky top-0 z-20">
                         <tr>
-                          <th className="px-6 py-4 text-left">Unit</th>
-                          <th className="px-6 py-4 text-left">Type</th>
-                          <th className="px-6 py-4 text-left">CIRS</th>
-                          <th className="px-6 py-4 text-right">Actual Rev</th>
-                          <th className="px-6 py-4 text-right">ADR</th>
-                          <th className="px-6 py-4 text-right">RevPAR</th>
-                          <th className="px-6 py-4 text-right">Occupancy %</th>
-                          <th className="px-6 py-4 text-right">Future Avail</th>
-                          {isRSEnabled && <th className="px-6 py-4 text-right">Revenue Score</th>}
-                          <th className="px-8 py-4 text-right">{isRSEnabled ? 'Global Rank' : 'Rank'}</th>
+                          <th className="px-6 py-4 text-left w-16">Unit</th>
+                          <th className="px-6 py-4 text-left w-32">Room Type</th>
+                          <th className="px-6 py-4 text-left w-24">
+                            <Tooltip text="Check-In Readiness Status: Real-time operational state." position="bottom" align="left">
+                              <span className="flex items-center gap-1 underline decoration-dotted decoration-slate-300">CIRS <Info className="w-3 h-3 text-slate-300" /></span>
+                            </Tooltip>
+                          </th>
+                          <th className="px-6 py-4 text-right w-24 border-l border-slate-200">
+                            <Tooltip text="Total occupancy % (Guest + Owner + Blocked)." position="bottom">
+                              <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300 font-bold text-slate-700">Total Occ <Info className="w-3 h-3 text-slate-400" /></span>
+                            </Tooltip>
+                          </th>
+                          <th className="px-6 py-4 text-right w-24">
+                            <Tooltip text="Percentage of guest stays (paid bookings)." position="bottom">
+                              <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300">Guest Occ <Info className="w-3 h-3 text-slate-300" /></span>
+                            </Tooltip>
+                          </th>
+                          <th className="px-6 py-4 text-right w-24">
+                            <Tooltip text="Percentage of owner personal stay nights." position="bottom">
+                              <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300">Owner Occ <Info className="w-3 h-3 text-slate-300" /></span>
+                            </Tooltip>
+                          </th>
+                          <th className="px-6 py-4 text-right w-24">
+                            <Tooltip text="Percentage of nights blocked for maintenance or other reasons." position="bottom">
+                              <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300">Blocked <Info className="w-3 h-3 text-slate-300" /></span>
+                            </Tooltip>
+                          </th>
+                          <th className="px-6 py-4 text-right w-28 border-l border-slate-200">Actual Rev</th>
+                          {isRSEnabled && (
+                            <th className="px-6 py-4 text-right w-24">
+                              <Tooltip text="Estimated revenue value of owner stay nights." position="bottom">
+                                <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300 whitespace-nowrap">Imputed Rev <Info className="w-3 h-3 text-slate-300" /></span>
+                              </Tooltip>
+                            </th>
+                          )}
+                          <th className="px-6 py-4 text-right w-24 border-l border-slate-200">
+                            <Tooltip text="Total future booked nights % (Guest + Owner + Blocked)." position="bottom">
+                              <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300 leading-[1.1] font-bold text-slate-700">Total Future <br /> Occ <Info className="w-3 h-3 text-slate-400" /></span>
+                            </Tooltip>
+                          </th>
+                          <th className="px-6 py-4 text-right w-24">
+                            <Tooltip text="Future guest bookings." position="bottom">
+                              <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300 leading-[1.1]">Future <br /> Guest <Info className="w-3 h-3 text-slate-300" /></span>
+                            </Tooltip>
+                          </th>
+                          <th className="px-6 py-4 text-right w-24">
+                            <Tooltip text="Future owner bookings." position="bottom">
+                              <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300 leading-[1.1]">Future <br /> Owner <Info className="w-3 h-3 text-slate-300" /></span>
+                            </Tooltip>
+                          </th>
+                          <th className="px-6 py-4 text-right w-24">
+                            <Tooltip text="Future blocked nights." position="bottom">
+                              <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300 leading-[1.1]">Future <br /> Blocked <Info className="w-3 h-3 text-slate-300" /></span>
+                            </Tooltip>
+                          </th>
+                          <th className="px-6 py-4 text-right w-28">
+                            <Tooltip text="Available capacity for bookings over the next 30 days." position="bottom">
+                              <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300 leading-[1.1]">Future <br /> Avail <Info className="w-3 h-3 text-slate-300" /></span>
+                            </Tooltip>
+                          </th>
+                          {isRSEnabled && (
+                            <th className="px-6 py-4 text-right w-24 border-l border-slate-200">
+                              <Tooltip text="Relative performance score (0-100) within room type cohort." position="bottom">
+                                <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300 whitespace-nowrap">Revenue Score <Info className="w-3 h-3 text-slate-300" /></span>
+                              </Tooltip>
+                            </th>
+                          )}
+                          <th className={clsx("px-8 py-4 text-right w-24 font-bold", !isRSEnabled && "border-l border-slate-200")}>
+                            <Tooltip text={isRSEnabled ? "Priority within this Room Type cohort." : "Relative rank within group."} position="bottom" align="right">
+                              <span className="underline decoration-dotted decoration-slate-300">{isRSEnabled ? 'Priority' : 'Rank'}</span>
+                            </Tooltip>
+                          </th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100">
                         {owner.rooms.map(room => (
                           <tr key={room.id} onClick={() => onRoomClick(room)} className="hover:bg-white cursor-pointer transition-colors bg-white/50">
-                            <td className="px-8 py-3 font-bold text-slate-900">{room.number}</td>
-                            <td className="px-6 py-3 text-[10px] font-bold text-slate-500 uppercase">{room.roomTypeName}</td>
-                            <td className="px-6 py-3"><CIRSBadge status={room.cirs} /></td>
-                            <td className="px-6 py-3 text-right font-bold text-blue-600">{formatCurrency(room.actualRevenue)}</td>
-                            <td className="px-6 py-3 text-right font-bold text-slate-600 text-xs">{formatCurrency(room.adr)}</td>
-                            <td className="px-6 py-3 text-right font-bold text-slate-600 text-xs">{formatCurrency(Math.round(room.adr * room.occupancy / 100))}</td>
-                            <td className="px-6 py-3 text-right font-bold text-slate-700">{room.occupancy}%</td>
-                            <td className="px-6 py-3 text-right font-bold text-emerald-600 text-xs">{room.futureAvailableNights} / 30</td>
-                            {isRSEnabled && <td className="px-6 py-3 text-right font-black">{formatRS(room.rs)}</td>}
-                            <td className="px-8 py-3 text-right font-bold text-slate-400 text-xs">#{room.rank}</td>
+                            <td className="px-8 py-3 font-bold text-slate-900 w-16">{room.number}</td>
+                            <td className="px-6 py-3 text-[10px] font-bold text-slate-500 uppercase w-32">{room.roomTypeName}</td>
+                            <td className="px-6 py-3 w-24"><CIRSBadge status={room.cirs} /></td>
+                            <td className="px-6 py-3 text-right font-bold text-slate-900 w-24 border-l border-slate-200 bg-slate-50/50">{room.occupancy}%</td>
+                            <td className="px-6 py-3 text-right font-bold text-slate-700 w-24">
+                              {room.guestOccupancyPct}% <span className="text-[10px] text-slate-400 font-normal">({room.guestNights})</span>
+                            </td>
+                            <td className="px-6 py-3 text-right font-bold text-slate-700 w-24">
+                              {room.ownerOccupancyPct}% <span className="text-[10px] text-slate-400 font-normal">({room.ownerNights})</span>
+                            </td>
+                            <td className="px-6 py-3 text-right font-bold text-slate-700 w-24">
+                              {room.blockedOccupancyPct}% <span className="text-[10px] text-slate-400 font-normal">({room.blockedNights})</span>
+                            </td>
+                            <td className="px-6 py-3 text-right font-bold text-blue-600 w-28 border-l border-slate-200">{formatCurrency(room.actualRevenue)}</td>
+                            {isRSEnabled && (
+                              <td className="px-6 py-3 text-right whitespace-nowrap w-24">
+                                <span className="font-bold text-slate-600 text-xs">{formatCurrency(room.imputedRevenue)}</span>
+                                <span className="text-[9px] font-bold text-slate-400 ml-0.5">({room.ownerNights})</span>
+                              </td>
+                            )}
+                            <td className="px-6 py-3 text-right font-bold text-slate-900 text-[10px] whitespace-nowrap w-24 border-l border-slate-200 bg-slate-50/50">
+                              {Math.round((30 - room.futureAvailableNights) / 30 * 100)}% <span className="text-[9px] text-slate-400 font-normal">({30 - room.futureAvailableNights})</span>
+                            </td>
+                            <td className="px-6 py-3 text-right font-bold text-slate-700 text-[10px] whitespace-nowrap w-24">
+                              {room.futureGuestPct}% <span className="text-[9px] text-slate-400 font-normal">({room.futureGuestNights})</span>
+                            </td>
+                            <td className="px-6 py-3 text-right font-bold text-slate-700 text-[10px] whitespace-nowrap w-24">
+                              {room.futureOwnerPct}% <span className="text-[9px] text-slate-400 font-normal">({room.futureOwnerNights})</span>
+                            </td>
+                            <td className="px-6 py-3 text-right font-bold text-slate-700 text-[10px] whitespace-nowrap w-24">
+                              {room.futureBlockedPct}% <span className="text-[9px] text-slate-400 font-normal">({room.futureBlockedNights})</span>
+                            </td>
+                            <td className="px-6 py-3 text-right font-bold text-slate-700 text-xs w-28">{room.futureAvailableNights} / 30</td>
+                            {isRSEnabled && <td className="px-6 py-3 text-right font-black w-24 border-l border-slate-200">{formatRS(room.rs)}</td>}
+                            <td className={clsx("px-8 py-3 text-right font-bold text-slate-400 text-xs w-32", !isRSEnabled && "border-l border-slate-200")}>#{room.rank}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -574,52 +727,80 @@ function PerformanceTab({ onRoomClick, isRSEnabled }) {
             <table className={clsx("w-full text-sm text-left", isRSEnabled ? "min-w-[1400px]" : "min-w-[1000px]")}>
               <thead className="bg-slate-50 text-slate-500 font-bold uppercase tracking-widest text-[10px] border-b border-slate-200">
                 <tr>
-                  <th className="px-6 py-5">{isRSEnabled ? 'Rank' : 'ID'}</th>
-                  <th className="px-6 py-5">Internal ID</th>
-                  <th className="px-6 py-5">Group Type</th>
-                  {isRSEnabled && <th className="px-6 py-5">Portfolio Owner</th>}
-                  <th className="px-6 py-5">
-                    <Tooltip text="Check-In Readiness Status: Real-time operational state.">
+                  <th className="px-6 py-5 w-24 font-bold">
+                    <Tooltip text={isRSEnabled ? "Priority within Room Type cohort." : "Internal unit ID."} position="bottom" align="left">
+                      <span className="underline decoration-dotted decoration-slate-300">{isRSEnabled ? 'Priority' : 'ID'}</span>
+                    </Tooltip>
+                  </th>
+                  <th className="px-6 py-5 w-16">Unit</th>
+                  <th className="px-6 py-5 w-32">Group Type</th>
+                  {isRSEnabled && <th className="px-6 py-5 w-40">Portfolio Owner</th>}
+                  <th className="px-6 py-5 w-24">
+                    <Tooltip text="Check-In Readiness Status: Real-time operational state." position="bottom">
                       <span className="flex items-center gap-1 underline decoration-dotted decoration-slate-300">CIRS <Info className="w-3 h-3 text-slate-300" /></span>
                     </Tooltip>
                   </th>
-                  <th className="px-6 py-5 text-right font-bold">
-                    <Tooltip text="Booked nights / Available nights.">
-                      <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300">Occupancy <Info className="w-3 h-3 text-slate-300" /></span>
+                  <th className="px-6 py-5 text-right font-bold w-24 border-l border-slate-200">
+                    <Tooltip text="Total occupancy % (Guest + Owner + Blocked)." position="bottom">
+                      <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300 font-bold text-slate-700">Total Occ <Info className="w-3 h-3 text-slate-400" /></span>
                     </Tooltip>
                   </th>
-                  <th className="px-6 py-5 text-right font-bold">
-                    <Tooltip text="Average Daily Rate.">
-                      <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300">ADR <Info className="w-3 h-3 text-slate-300" /></span>
+                  <th className="px-6 py-5 text-right font-bold w-24">
+                    <Tooltip text="Percentage of guest stays (paid bookings)." position="bottom">
+                      <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300">Guest Occ <Info className="w-3 h-3 text-slate-300" /></span>
                     </Tooltip>
                   </th>
-                  <th className="px-6 py-5 text-right font-bold">
-                    <Tooltip text="Revenue Per Available Room.">
-                      <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300">RevPAR <Info className="w-3 h-3 text-slate-300" /></span>
+                  <th className="px-6 py-5 text-right font-bold w-24">
+                    <Tooltip text="Percentage of owner personal stay nights." position="bottom">
+                      <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300">Owner Occ <Info className="w-3 h-3 text-slate-300" /></span>
                     </Tooltip>
                   </th>
-                  <th className="px-6 py-5 text-right font-bold">Actual Revenue</th>
-
+                  <th className="px-6 py-5 text-right font-bold w-24">
+                    <Tooltip text="Percentage of nights blocked for maintenance or other reasons." position="bottom">
+                      <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300">Blocked <Info className="w-3 h-3 text-slate-300" /></span>
+                    </Tooltip>
+                  </th>
+                  <th className="px-6 py-5 text-right font-bold w-28 border-l border-slate-200">Actual Revenue</th>
                   {isRSEnabled && (
-                    <th className="px-6 py-5 text-right font-bold group">
-                      <Tooltip text="Estimated revenue value of owner stay nights.">
+                    <th className="px-6 py-5 text-right font-bold group w-28">
+                      <Tooltip text="Estimated revenue value of owner stay nights." position="bottom">
                         <div className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300">Imputed Rev <Info className="w-3 h-3 text-slate-400" /></div>
                       </Tooltip>
                     </th>
                   )}
-                  <th className="px-6 py-5 text-right font-bold">
-                    <Tooltip text="Percentage of nights available in the next 30 days.">
-                      <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300 whitespace-nowrap">Future Availability <Info className="w-3 h-3 text-slate-300" /></span>
+                  <th className="px-6 py-5 text-right font-bold w-24">
+                    <Tooltip text="Total future booked nights % (Guest + Owner + Blocked)." position="bottom">
+                      <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300 leading-[1.1] font-bold text-slate-700">Total Future <br /> Occ <Info className="w-3 h-3 text-slate-400" /></span>
+                    </Tooltip>
+                  </th>
+                  <th className="px-6 py-5 text-right font-bold w-24">
+                    <Tooltip text="Future guest bookings." position="bottom">
+                      <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300 leading-[1.1]">Future <br /> Guest <Info className="w-3 h-3 text-slate-300" /></span>
+                    </Tooltip>
+                  </th>
+                  <th className="px-6 py-5 text-right font-bold w-24">
+                    <Tooltip text="Future owner bookings." position="bottom">
+                      <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300 leading-[1.1]">Future <br /> Owner <Info className="w-3 h-3 text-slate-300" /></span>
+                    </Tooltip>
+                  </th>
+                  <th className="px-6 py-5 text-right font-bold w-24">
+                    <Tooltip text="Future blocked nights." position="bottom">
+                      <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300 leading-[1.1]">Future <br /> Blocked <Info className="w-3 h-3 text-slate-300" /></span>
+                    </Tooltip>
+                  </th>
+                  <th className="px-6 py-5 text-right font-bold w-24">
+                    <Tooltip text="Percentage of nights available in the next 30 days." position="bottom">
+                      <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300 leading-[1.1]">Future <br /> Availability <Info className="w-3 h-3 text-slate-300" /></span>
                     </Tooltip>
                   </th>
                   {isRSEnabled && (
-                    <th className="px-6 py-5 text-right font-bold">
-                      <Tooltip text="Relative performance score (0-100) within room type cohort.">
-                        <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300">Revenue Score <Info className="w-3 h-3 text-slate-300" /></span>
+                    <th className="px-6 py-5 text-right font-bold w-24 border-l border-slate-200">
+                      <Tooltip text="Relative performance score (0-100) within room type cohort." position="bottom" align="right">
+                        <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300 whitespace-nowrap">Revenue Score <Info className="w-3 h-3 text-slate-300" /></span>
                       </Tooltip>
                     </th>
                   )}
-                  <th className="px-6 py-5"></th>
+                  <th className={clsx("px-6 py-5 w-10", !isRSEnabled && "border-l border-slate-200")}></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -637,21 +818,39 @@ function PerformanceTab({ onRoomClick, isRSEnabled }) {
                       </td>
                     )}
                     <td className="px-6 py-4"><CIRSBadge status={room.cirs} /></td>
-                    <td className="px-6 py-4 text-right font-bold text-slate-700">{room.occupancy}%</td>
-                    <td className="px-6 py-4 text-right font-bold text-slate-600 text-xs">{formatCurrency(room.adr)}</td>
-                    <td className="px-6 py-4 text-right font-bold text-slate-600 text-xs">{formatCurrency(Math.round(room.adr * room.occupancy / 100))}</td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-6 py-4 text-right font-bold text-slate-900 w-24 border-l border-slate-200 bg-slate-50/50">{room.occupancy}%</td>
+                    <td className="px-6 py-4 text-right font-bold text-slate-700 w-24">
+                      {room.guestOccupancyPct}% <span className="text-[10px] text-slate-400 font-normal">({room.guestNights})</span>
+                    </td>
+                    <td className="px-6 py-4 text-right font-bold text-slate-700 w-24">
+                      {room.ownerOccupancyPct}% <span className="text-[10px] text-slate-400 font-normal">({room.ownerNights})</span>
+                    </td>
+                    <td className="px-6 py-4 text-right font-bold text-slate-700 w-24">
+                      {room.blockedOccupancyPct}% <span className="text-[10px] text-slate-400 font-normal">({room.blockedNights})</span>
+                    </td>
+                    <td className="px-6 py-4 text-right border-l border-slate-200">
                       <span className="font-bold text-blue-600">{formatCurrency(room.actualRevenue)}</span>
-                      {isRSEnabled && <span className="text-[10px] font-bold text-slate-400 ml-1">({room.ownerNights})</span>}
                     </td>
                     {isRSEnabled && (
                       <td className="px-6 py-4 text-right font-bold text-slate-600 text-xs">
-                        {formatCurrency(room.imputedRevenue)} ({room.ownerNights})
+                        {formatCurrency(room.imputedRevenue)} <span className="text-[10px] font-bold text-slate-400 ml-0.5">({room.ownerNights})</span>
                       </td>
                     )}
-                    <td className="px-6 py-4 text-right font-bold text-emerald-600 text-xs">{room.futureAvailableNights} / 30</td>
-                    {isRSEnabled && <td className="px-6 py-4 text-right font-black text-slate-900">{formatRS(room.rs)}</td>}
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-6 py-4 text-right font-bold text-slate-900 w-24 bg-slate-50/50">
+                      {Math.round((30 - room.futureAvailableNights) / 30 * 100)}% <span className="text-[9px] text-slate-400 font-normal">({30 - room.futureAvailableNights})</span>
+                    </td>
+                    <td className="px-6 py-4 text-right font-bold text-slate-700 text-[10px] whitespace-nowrap w-24">
+                      {room.futureGuestPct}% <span className="text-[9px] text-slate-400 font-normal">({room.futureGuestNights})</span>
+                    </td>
+                    <td className="px-6 py-4 text-right font-bold text-slate-700 text-[10px] whitespace-nowrap w-24">
+                      {room.futureOwnerPct}% <span className="text-[9px] text-slate-400 font-normal">({room.futureOwnerNights})</span>
+                    </td>
+                    <td className="px-6 py-4 text-right font-bold text-slate-700 text-[10px] whitespace-nowrap w-24">
+                      {room.futureBlockedPct}% <span className="text-[9px] text-slate-400 font-normal">({room.futureBlockedNights})</span>
+                    </td>
+                    <td className="px-6 py-4 text-right font-bold text-slate-700 text-xs">{room.futureAvailableNights} / 30</td>
+                    {isRSEnabled && <td className="px-6 py-4 text-right font-black text-slate-900 border-l border-slate-200">{formatRS(room.rs)}</td>}
+                    <td className={clsx("px-6 py-4 text-right", !isRSEnabled && "border-l border-slate-200")}>
                       <div className="flex items-center justify-end gap-2">
                         {room.isOutlier && isRSEnabled && <OutlierBadge reason={room.outlierReason} />}
                         <div className="opacity-0 group-hover:opacity-100 transition-opacity">
@@ -1157,6 +1356,54 @@ const RoomDetailsDrawer = ({ room, onClose, isRSEnabled }) => {
                   <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase">{room.ownerNights} Owner Stays</p>
                 </div>
               )}
+
+              <div className="bg-slate-50 rounded-xl border border-slate-200 p-4 col-span-2 space-y-3">
+                <div className="flex items-baseline justify-between border-b border-slate-200 pb-2">
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Occupancy Breakdown</p>
+                  <p className="text-sm font-black text-slate-900">{room.occupancy}% Total</p>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="text-center p-2 bg-white rounded border border-slate-100">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase mb-0.5">Guest</p>
+                    <p className="text-lg font-bold text-slate-700">{room.guestOccupancyPct}%</p>
+                    <p className="text-[9px] font-bold text-slate-400">({room.guestNights} nights)</p>
+                  </div>
+                  <div className="text-center p-2 bg-white rounded border border-slate-100">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase mb-0.5">Owner</p>
+                    <p className="text-lg font-bold text-slate-700">{room.ownerOccupancyPct}%</p>
+                    <p className="text-[9px] font-bold text-slate-400">({room.ownerNights} nights)</p>
+                  </div>
+                  <div className="text-center p-2 bg-white rounded border border-slate-100">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase mb-0.5">Blocked</p>
+                    <p className="text-lg font-bold text-slate-700">{room.blockedOccupancyPct}%</p>
+                    <p className="text-[9px] font-bold text-slate-400">({room.blockedNights} nights)</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-slate-50 rounded-xl border border-slate-200 p-4 col-span-2 space-y-3">
+                <div className="flex items-baseline justify-between border-b border-slate-200 pb-2">
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Future Occupancy Breakdown</p>
+                  <p className="text-sm font-black text-slate-900">{Math.round((30 - room.futureAvailableNights) / 30 * 100)}% Total</p>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="text-center p-2 bg-white rounded border border-slate-100">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase mb-0.5">Guest</p>
+                    <p className="text-lg font-bold text-slate-700">{room.futureGuestPct}%</p>
+                    <p className="text-[9px] font-bold text-slate-400">({room.futureGuestNights} nights)</p>
+                  </div>
+                  <div className="text-center p-2 bg-white rounded border border-slate-100">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase mb-0.5">Owner</p>
+                    <p className="text-lg font-bold text-slate-700">{room.futureOwnerPct}%</p>
+                    <p className="text-[9px] font-bold text-slate-400">({room.futureOwnerNights} nights)</p>
+                  </div>
+                  <div className="text-center p-2 bg-white rounded border border-slate-100">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase mb-0.5">Blocked</p>
+                    <p className="text-lg font-bold text-slate-700">{room.futureBlockedPct}%</p>
+                    <p className="text-[9px] font-bold text-slate-400">({room.futureBlockedNights} nights)</p>
+                  </div>
+                </div>
+              </div>
               {isRSEnabled && (
                 <div className="bg-blue-600 rounded-xl p-5 shadow-lg shadow-blue-100 col-span-2">
                   <div className="flex justify-between items-start">
