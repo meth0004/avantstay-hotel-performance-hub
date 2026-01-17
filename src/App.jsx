@@ -257,7 +257,7 @@ export default function App() {
       <FilterDrawer isOpen={isFiltersOpen} onClose={() => setIsFiltersOpen(false)} isRSEnabled={isRSEnabled} />
 
       <main className="flex-1 p-8 overflow-y-auto bg-slate-50/50">
-        <div className="max-w-7xl mx-auto">
+        <div className="w-full max-w-[1920px] px-6 mx-auto">
           {activeTab === 'performance' && <PerformanceTab onRoomClick={setSelectedRoom} isRSEnabled={isRSEnabled} />}
           {activeTab === 'ops' && <OpsTab onRoomClick={setSelectedRoom} isRSEnabled={isRSEnabled} />}
           {activeTab === 'comparison' && <ComparisonTab isRSEnabled={isRSEnabled} />}
@@ -370,12 +370,12 @@ function PerformanceTab({ onRoomClick, isRSEnabled }) {
                     <table className="w-full text-sm min-w-[1000px]">
                       <thead className="bg-slate-50 text-slate-500 font-bold uppercase tracking-widest text-[10px] border-b border-slate-200 sticky top-0 z-20">
                         <tr>
-                          <th className="px-4 py-4 text-left w-20">
+                          <th className="px-4 py-4 text-left w-24 min-w-[6rem] sticky left-0 z-30 bg-slate-50 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                             <Tooltip text={isRSEnabled ? "Priority within this Room Type." : "Relative rank within group."} position="bottom" align="left">
                               <span className="underline decoration-dotted decoration-slate-300">{isRSEnabled ? 'Priority' : 'Rank'}</span>
                             </Tooltip>
                           </th>
-                          <th className="px-4 py-4 text-left w-16">Unit</th>
+                          <th className="px-4 py-4 text-left w-16 sticky left-24 z-30 bg-slate-50 border-r border-slate-200 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Unit</th>
                           <th className="px-4 py-4 text-right w-24 border-l border-slate-200">
                             <Tooltip text="Total occupancy % (Guest + Owner + Blocked)." position="bottom">
                               <span className="flex items-center justify-end gap-1 underline decoration-dotted decoration-slate-300 font-bold text-slate-700">Total Occ <Info className="w-3 h-3 text-slate-400" /></span>
@@ -459,8 +459,8 @@ function PerformanceTab({ onRoomClick, isRSEnabled }) {
                       <tbody className="divide-y divide-slate-100">
                         {rooms.filter(r => r.roomTypeId === rt.id).map(room => (
                           <tr key={room.id} onClick={() => onRoomClick(room)} className="hover:bg-slate-50 cursor-pointer transition-colors group">
-                            <td className="px-4 py-4 font-bold text-slate-400 text-xs w-24">#{room.rank}</td>
-                            <td className="px-4 py-4 font-bold text-slate-900 text-xs w-16">{room.number}</td>
+                            <td className="px-4 py-4 font-bold text-slate-400 text-xs w-24 min-w-[6rem] sticky left-0 z-10 bg-white group-hover:bg-slate-50 transition-colors shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">#{room.rank}</td>
+                            <td className="px-4 py-4 font-bold text-slate-900 text-xs w-16 sticky left-24 z-10 bg-white group-hover:bg-slate-50 transition-colors border-r border-slate-200 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">{room.number}</td>
                             <td className="px-4 py-4 text-right font-bold text-slate-900 text-xs w-24 border-l border-slate-200 bg-slate-50/50">{room.occupancy}%</td>
                             <td className="px-4 py-4 text-right font-bold text-slate-700 text-xs w-24">
                               {room.guestOccupancyPct}% <span className="text-[10px] text-slate-400 font-normal">({room.guestNights})</span>
@@ -597,7 +597,7 @@ function PerformanceTab({ onRoomClick, isRSEnabled }) {
                     <table className="w-full text-sm min-w-[1000px]">
                       <thead className="bg-slate-100/50 text-slate-500 font-bold uppercase tracking-widest text-[10px] border-b border-slate-100 sticky top-0 z-20">
                         <tr>
-                          <th className="px-6 py-4 text-left w-16">Unit</th>
+                          <th className="px-6 py-4 text-left w-16 sticky left-0 z-30 bg-slate-100 border-r border-slate-200 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Unit</th>
                           <th className="px-6 py-4 text-left w-32">Room Type</th>
                           <th className="px-6 py-4 text-left w-24">
                             <Tooltip text="Check-In Readiness Status: Real-time operational state." position="bottom" align="left">
@@ -664,17 +664,13 @@ function PerformanceTab({ onRoomClick, isRSEnabled }) {
                               </Tooltip>
                             </th>
                           )}
-                          <th className={clsx("px-8 py-4 text-right w-24 font-bold", !isRSEnabled && "border-l border-slate-200")}>
-                            <Tooltip text={isRSEnabled ? "Priority within this Room Type cohort." : "Relative rank within group."} position="bottom" align="right">
-                              <span className="underline decoration-dotted decoration-slate-300">{isRSEnabled ? 'Priority' : 'Rank'}</span>
-                            </Tooltip>
-                          </th>
+                          <th className="w-10"></th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100">
                         {owner.rooms.map(room => (
                           <tr key={room.id} onClick={() => onRoomClick(room)} className="hover:bg-white cursor-pointer transition-colors bg-white/50">
-                            <td className="px-8 py-3 font-bold text-slate-900 w-16">{room.number}</td>
+                            <td className="px-8 py-3 font-bold text-slate-900 w-16 sticky left-0 z-10 bg-white/80 group-hover:bg-white transition-colors border-r border-slate-200 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">{room.number}</td>
                             <td className="px-6 py-3 text-[10px] font-bold text-slate-500 uppercase w-32">{room.roomTypeName}</td>
                             <td className="px-6 py-3 w-24"><CIRSBadge status={room.cirs} /></td>
                             <td className="px-6 py-3 text-right font-bold text-slate-900 w-24 border-l border-slate-200 bg-slate-50/50">{room.occupancy}%</td>
@@ -708,7 +704,7 @@ function PerformanceTab({ onRoomClick, isRSEnabled }) {
                             </td>
                             <td className="px-6 py-3 text-right font-bold text-slate-700 text-xs w-28">{room.futureAvailableNights} / 30</td>
                             {isRSEnabled && <td className="px-6 py-3 text-right font-black w-24 border-l border-slate-200">{formatRS(room.rs)}</td>}
-                            <td className={clsx("px-8 py-3 text-right font-bold text-slate-400 text-xs w-32", !isRSEnabled && "border-l border-slate-200")}>#{room.rank}</td>
+                            <td className="w-10"></td>
                           </tr>
                         ))}
                       </tbody>
