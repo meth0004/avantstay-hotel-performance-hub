@@ -310,7 +310,7 @@ function PerformanceTab({ onRoomClick, isRSEnabled }) {
       {
         subView === 'roomType' && (
           <div className="space-y-4">
-            <p className="text-sm font-bold text-slate-500 uppercase tracking-widest pl-2">Cohort Group Monitoring</p>
+            <p className="text-sm font-bold text-slate-500 uppercase tracking-widest pl-2">By Room Type</p>
             {roomTypeSummary.map(rt => (
               <div key={rt.id} className="bg-white rounded-xl border border-slate-200 overflow-visible shadow-sm transition-all hover:shadow-md">
                 <button
